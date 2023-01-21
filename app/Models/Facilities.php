@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Facilities extends Model
 {
     use HasFactory;
+
+    protected $guarded = [
+        'id',
+    ];
+
+    public function Kost()
+    {
+        return $this->belongsTo(Kost::class);
+    }
+    
 }

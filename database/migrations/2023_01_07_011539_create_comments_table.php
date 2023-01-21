@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('kost_id');
             $table->foreignId('user_id');
             $table->string('comment_body');
             $table->integer('rating');

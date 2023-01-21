@@ -13,10 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('facilities', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            //Tempat Tidur
-            $table->string('name');
+            $table->foreignId('kost_id');
+            $table->foreignId('user_id');
+            $table->string('status');
+            $table->string('proof_img');
+            $table->string('stay_duration');
+            $table->string('transaction_id');
             $table->timestamps();
         });
     }
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('facilities');
+        Schema::dropIfExists('transactions');
     }
 };

@@ -35,24 +35,21 @@ public function store(Request $request){
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'role' => $request->role,
                 'password' => Hash::make($request->password),
             ]);
-            $data = User::where('email', $request->email)->firstOrFail();
-            $token = $user->createToken('Token-Login')->plainTextToken;
                 return response()->json([
                     'message' => 'register success',
-                    'data' => $data,
-                    'token' => $token
+                    'data' => $user,
+                
                  ]);
-            
-
-        
     
         } catch(Exception $e){
             return ApiFormatter::createApi(400, 'data is lacking');
         }
     
 }
+
 
 public function find($id){
         $data = User::find($id);
@@ -92,7 +89,7 @@ public function update(Request $request, $id)
      
     }
 
-    public function authenticate(Request $request)
+    public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email|string|max:200',
@@ -105,18 +102,31 @@ public function update(Request $request, $id)
             )
         ) {
             return response()
-                ->json(['message' => 'Try to check email and password'], 401);
+                ->json(['message' => 'Try to check email and password'], 422);
         }
 
+        
         $user = User::where('email', $request->email)->firstOrFail();
-
-        $token = $user->createToken('Token-Login')->plainTextToken;
-
+        if ($user->role == 'owner') {
+            $token = $user->createToken($request->email, ['owner'])->plainTextToken;
+        } else {
+            $token = $user->createToken($request->email, ['normal'])->plainTextToken;
+        }
+        
+        
         return response()->json([
             'message' => 'login success',
             'data' => $user,
             'token' => $token
          ]);
+    }
+
+    public function logout()
+    {
+        Auth::logoutCurrentDevice();
+        return response()->json([
+            'message' => 'logout success'
+        ]);
     }
 
 }

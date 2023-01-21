@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('kost_rules', function (Blueprint $table) {
+        Schema::create('kostand_facilities', function (Blueprint $table) {
             $table->id();
-            $table->string('body');
+            $table->foreignId('kost_id')->constrained('kosts');
+            $table->foreignId('facilities_id')->constrained('facilities');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('kost_rules');
+        Schema::dropIfExists('kostand_facilities');
     }
 };
