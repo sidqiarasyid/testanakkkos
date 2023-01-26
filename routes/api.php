@@ -49,6 +49,13 @@ Route::middleware(['auth:sanctum', 'abilities:owner'])->group(function () {
     
 });
 
+//admin
+Route::middleware(['auth:sanctum', 'abilities:admin'])->group(function () {
+    Route::post('/accept-kost',[KostController::class, 'accept']);
+    Route::post('/disable-kost',[KostController::class, 'disable']);
+    Route::delete('/delete-kost',[KostController::class, 'delete']);
+});
+
 //testing
 Route::post('/create-facilities', [FacilitesController::class, 'create']);
 Route::post('/search-kost', [KostController::class, 'filterKostByFacilities']);
