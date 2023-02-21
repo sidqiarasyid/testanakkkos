@@ -25,7 +25,7 @@ class CommentsController extends Controller
             'kost_id' => $request->kost_id,
             'user_id' => $request->user_id,
             'comment_body' => $request->comment_body,
-            'rating' => $request->rating
+        'rating' => $request->rating
         ]); 
 
         return response()->json([

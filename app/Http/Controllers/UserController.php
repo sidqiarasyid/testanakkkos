@@ -36,6 +36,7 @@ public function store(Request $request){
                 'name' => $request->name,
                 'email' => $request->email,
                 'role' => $request->role,
+                'chat_status' => 'no',
                 'password' => Hash::make($request->password),
             ]);
                 return response()->json([
@@ -66,14 +67,12 @@ public function update(Request $request, $id)
         try {
             $request->validate([
                 'name' => 'required',
-                'email' => 'required|email:dns',
             ]);
 
         $data = User::findOrFail($id);
 
         $data->update([
             'name' => $request->name,
-            'email' => $request->email
         ]);
 
         $dataW = User::where('id', '=', $data->id)->get();
@@ -88,6 +87,35 @@ public function update(Request $request, $id)
         }
      
     }
+
+    public function loginAdmin(Request $request){
+        $request->validate([
+            'name' => 'required',
+            'password' => 'required',
+        ]);
+
+        if (
+            !Auth::attempt(
+                $request->only('name', 'password')
+            )
+        ) {
+            return response()
+                ->json(['message' => 'Try to check name and password'], 422);
+        }
+
+        
+        $user = User::where('name', $request->name)->firstOrFail();
+        $token = $user->createToken($request->name, ['admin'])->plainTextToken;
+       
+        
+        return response()->json([
+            'message' => 'login success',
+            'data' => $user,
+            'token' => $token
+         ]);
+    }
+
+    
 
     public function login(Request $request)
     {
@@ -121,12 +149,14 @@ public function update(Request $request, $id)
          ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logoutCurrentDevice();
+        $request->user()->currentAccessToken()->delete();
         return response()->json([
-            'message' => 'logout success'
+            'message' => 'success logout`'
         ]);
     }
+
+    
 
 }

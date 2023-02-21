@@ -9,6 +9,10 @@ class KostandFacilities extends Model
 {
     use HasFactory;
 
+    protected $guarded = [
+        'id',
+    ];
+
     public function kost(){
         return $this->hasMany(Kost::class, 'id', 'kost_id');
     }
