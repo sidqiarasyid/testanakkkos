@@ -27,15 +27,22 @@ public function show(Request $request){
 public function store(Request $request){
             try {
             $request->validate([
-                    'name' => 'required',
+                    'first_name' => 'required',
+                    'last_name' => 'required',
                     'email' => 'required|email:dns|unique:users,email',
                     'password' => 'required'
                 ]);
-
+             
+            $firstName = $request->first_name;
+            $last_name = $request->last_name;
             $user = User::create([
-                'name' => $request->name,
+                'first_name' => $firstName,
+                'last_name' => $last_name,
+                'phone' => $request->phone,
+                'name' => $firstName . ' ' .  $last_name,
                 'email' => $request->email,
                 'role' => $request->role,
+                'pfp' => 'https://www.kostkostan.my.id/storage/image/defuser.png',
                 'chat_status' => 'no',
                 'password' => Hash::make($request->password),
             ]);
@@ -51,6 +58,55 @@ public function store(Request $request){
     
 }
 
+public function registerGoogle(Request $request){
+
+    $request->validate([
+            'name' => 'required',
+            'email' => 'required|email:dns|unique:users,email',
+        ]);  
+
+   
+        
+    $user = User::create([
+        'name' => $request->name,
+        'first_name' => $request->first_name,
+        'last_name' =>  $request->last_name,
+        'phone' => '09102',
+        'email' => $request->email,
+        'role' => 'user',
+        'pfp' => 'https://www.kostkostan.my.id/storage/image/defuser.png',
+        'chat_status' => 'no',
+        'password' => Hash::make('test1'),
+    ]);
+    $token = $user->createToken($request->name, ['normal'])->plainTextToken;
+        return response()->json([
+            'message' => 'register success',
+            'data' => $user,
+            'token' => $token,
+         ]);
+
+
+
+}
+
+public function loginGoogle(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email|string|max:200',
+    ]);
+
+
+    
+    $user = User::where('email', $request->email)->firstOrFail();
+    $token = $user->createToken($request->email, ['normal'])->plainTextToken;
+
+    return response()->json([
+        'message' => 'login success',
+        'data' => $user,
+        'token' => $token
+     ]);
+}
+
 
 public function find($id){
         $data = User::find($id);
@@ -62,29 +118,38 @@ public function find($id){
     
 }
 
+
 public function update(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'name' => 'required',
-            ]);
 
-        $data = User::findOrFail($id);
-
-        $data->update([
+        $userData = User::findOrFail($id); 
+        $dataW = User::where('id', '=', $userData->id)->get();
+        $oldPfp = $userData->pfp;
+        
+        if($request->pfp == 'inc'){
+            $img = $oldPfp;
+        } else{
+         $request->validate([
+            'pfp' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+             ]);
+         $name_path = 'pfp' . time() . $request->file('pfp')->getClientOriginalExtension();
+         $request->file('pfp')->storeAs('image/', $name_path, 'public');
+         $img = 'https://www.kostkostan.my.id/storage/image/' . $name_path;
+         
+        }
+        
+        $userData->update([
             'name' => $request->name,
+            'pfp' => $img
         ]);
 
-        $dataW = User::where('id', '=', $data->id)->get();
+        
 
         return response()->json([
             'message' => 'update success',
             'data' => $dataW,
          ]);
-        } catch(Exception $e){
-
-
-        }
+        
      
     }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kost_id');
             $table->foreignId('user_id');
+            $table->string('order_id');
             $table->string('status');
             $table->string('kost_name');
             $table->string('kost_type');

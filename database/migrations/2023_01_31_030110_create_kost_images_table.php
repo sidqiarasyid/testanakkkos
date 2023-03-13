@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kost_id');
             $table->string('img');
+            $table->string('img_type');
             $table->timestamps();
         });
     }

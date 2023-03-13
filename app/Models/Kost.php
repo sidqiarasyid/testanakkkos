@@ -20,6 +20,12 @@ class Kost extends Model
         return $this->hasMany(Comments::class);
     }
 
+    public function rating()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+
     public function facilities()
     {
         return $this->hasMany(Facilities::class);
@@ -43,6 +49,14 @@ class Kost extends Model
 
     public function chatroom(){
         return $this->hasMany(KostChat::class);
+    }
+
+    public function krules(){
+        return $this->hasMany(KostRules::class);
+    }
+
+    public function rrules(){
+        return $this->hasMany(RoomRules::class);
     }
 
 

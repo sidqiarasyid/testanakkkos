@@ -13,16 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('kost_chats', function (Blueprint $table) {
+        Schema::create('kost_rules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->integer('seller_id');
-            $table->string('seller_name');
             $table->foreignId('kost_id');
-            $table->string('user_pfp');
-            $table->string('seller_pfp');
-            $table->string('username');
-            $table->string('kost_name');
+            $table->string('content');
             $table->timestamps();
         });
     }
@@ -34,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('kost_chats');
+        Schema::dropIfExists('kost_rules');
     }
 };

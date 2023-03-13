@@ -17,11 +17,15 @@ class ChatRoomController extends Controller
         $kostname = Kost::where('id', $kost_id)->pluck('kost_name')->first();
         $username = User::where('id', $userid)->pluck('name')->first();
         $sellername = User::where('id', $seller_id)->pluck('name')->first();
+        $userPfp = User::where('id', $userid)->pluck('pfp')->first();
+        $sellerPfp = User::where('id', $seller_id)->pluck('pfp')->first();
         $data = KostChat::create([
                 'kost_id' => $kost_id,
                 'seller_id' => $seller_id,
                 'seller_name' => $sellername,
                 'user_id' => $userid,
+                'user_pfp' => $userPfp,
+                'seller_pfp' => $sellerPfp,
                 'username' => $username,
                 'kost_name' => $kostname,
             ]);

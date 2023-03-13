@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetailKost;
 use App\Models\Kost;
+use App\Models\KostImages;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -16,6 +17,7 @@ class DetailKostController extends Controller
         $kostName = Kost::where('id', $kostId)->pluck('kost_name')->first();
         $kostLocation = Kost::where('id', $kostId)->pluck('location')->first();
         $unit_open = Kost::where('id', $kostId)->pluck('total_unit')->first();
+        $cover_image = KostImages::where('img_type', '=', 'cover_img')->where('kost_id', $kostId)->pluck('img')->first();
         $data = DetailKost::create([
             'seller_id' => $request->seller_id,
             'kost_id' => $kostId,
@@ -25,7 +27,7 @@ class DetailKostController extends Controller
             'unit_open' => $unit_open,
             'kost_name' => $kostName,
             'status' => 'pending',
-            'kost_img' => 'kosong',
+            'kost_img' => $cover_image,
             'kost_location' => $kostLocation
         ]);
         return response()->json([

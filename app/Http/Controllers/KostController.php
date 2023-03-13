@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DetailKost;
 use App\Models\Kost;
-use App\Models\Comments;
-use App\Models\KostandFacilities;
 use App\Models\Reason;
+use App\Models\Comments;
+use App\Models\DetailKost;
+use App\Models\KostImages;
 use Illuminate\Http\Request;
+use App\Models\KostandFacilities;
 use Illuminate\Routing\Controller;
 
 class KostController extends Controller
 {
     public function show()
     {
-        $data = Kost::with('user')->get();
+        $data = Kost::all();
         return response()->json([
             'message' => 'success retrieved',
             'data' => $data
@@ -24,7 +25,26 @@ class KostController extends Controller
 
     public function getDetail($id)
     {
-        $data = Kost::find($id)->with('user')->first();
+        $data = Kost::where('id', $id)->with('user')->first();
+        return response()->json([
+            'message' => 'success',
+            'data' => $data
+        ]);
+    }
+
+    public function getDetailAcc()
+    {
+        $data = Kost::where('acc_status', '=', 'accepted')
+        ->orWhere('acc_status', '=', 'rejected')->get();
+        return response()->json([
+            'message' => 'success',
+            'data' => $data
+        ]);
+    }
+
+    public function getPending()
+    {
+        $data = Kost::where('acc_status', '=', 'pending')->get();
         return response()->json([
             'message' => 'success',
             'data' => $data
@@ -42,6 +62,7 @@ class KostController extends Controller
             'seller_id' => $request->seller_id,
             'unit_open' => $request->total_unit,
             'kost_name' => $request->kost_name,
+            'cover_img' => 'https://www.kostkostan.my.id/storage/image/kost.jpg',
             'location' => $request->location,
             'location_url' => $request->location_url,
             'kost_type' => $request->kost_type,
@@ -51,8 +72,6 @@ class KostController extends Controller
             'width' => $request->width,
             'weight' => $request->weight,
             'payment_period' => $request->payment_period,
-            'room_rules' => $request->room_rules,
-            'kost_rules' => $request->kost_rules,
             'room_price' => $room_price,
             'elec_price' => $elec_price,
             'total_price' => $room_price + $elec_price
@@ -64,14 +83,23 @@ class KostController extends Controller
         ]);
         
     }
+    
+    public function addCoverImage($kostId){
+        $img = KostImages::where('img_type', '=', 'cover_img')->where('kost_id', $kostId)->pluck('img')->first();
+        return Kost::where('id', $kostId)->update([
+            'cover_img' => $img
+        ]);
+    }
+
+    
 
     public function updateStatusAcc($id){
-        $data = Kost::firstOrFail($id);
+        $data = Kost::where('id', $id);
         $data->update([
             'acc_status' => 'accepted'
         ]);
 
-        $data2 = DetailKost::firstOrFail($id);
+        $data2 = DetailKost::where('id', $id);
         $data2->update([
             'status' => 'accepted'
         ]);
@@ -85,17 +113,17 @@ class KostController extends Controller
 
     public function updateStatusRej(Request $request){
         $ids = $request->kost_id;
-        $data = Kost::firstOrFail($ids);
+        $data = Kost::where('id', $ids);
         $data->update([
             'acc_status' => 'rejected'
         ]);
-        $data2 = DetailKost::firstOrFail($ids);
+        $data2 = DetailKost::where('id', $ids);
         $data2->update([
             'status' => 'rejected'
         ]);
 
         $data3 = Reason::create([
-            'detail_id' => $request->user_id,
+            'detail_id' => $request->detail_id,
             'reason' => $request->reason,
         ]);
         return response()->json([
@@ -131,13 +159,20 @@ class KostController extends Controller
     
 
     public function delete($id){
-        $data = Kost::find('id', $id);
-        return $data;
+        $data = Kost::where('id', $id);
+        $data2 = DetailKost::where('id', $id);
+        $data3 = KostandFacilities::where('kost_id', $id);
+        $data3->delete();
+        $data2->delete();
+        $data->delete();
+        return response()->json([
+            'message' => 'data deleted successfully'
+        ]);
     }
 
 
     public function findPopularKost($location){
-        $data = Kost::where('location', 'like', '%' . $location . '%')->where('rating', '>=', 4)->latest()->get();
+        $data = Kost::where('location', 'like', '%' . $location . '%')->where('rating', '>=', 4)->where('acc_status', '=', 'accepted')->latest()->get();
         if($data == null){
             return response()->json([
                 'message' => 'data not found',
@@ -151,7 +186,7 @@ class KostController extends Controller
     }
     
     public function findNearestKost($location){
-        $data = Kost::where('location', 'like', '%' . $location . '%')->get();
+        $data = Kost::where('location', 'like', '%' . $location . '%')->where('acc_status', '=', 'accepted')->get();
         return response()->json([
             'message' => 'success',
             'data' => $data
@@ -164,7 +199,6 @@ class KostController extends Controller
         foreach($request->data as $key => $value) {
             $dataId = KostandFacilities::where('facilities_id', $value)->pluck('kost_id');
         }
-
         $listKost = [];
         foreach($dataId as $keyy => $val2){        
             $kost = Kost::where('id', $val2)->get();

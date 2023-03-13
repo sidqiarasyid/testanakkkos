@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('acc_status');
             $table->foreignId('seller_id');
+            $table->string('cover_img');
             $table->string('kost_name');
             $table->string('location');
             $table->string('location_url');
@@ -24,8 +25,6 @@ return new class extends Migration
             $table->integer('rating');
             $table->string('width');
             $table->string('weight');
-            $table->string('room_rules');
-            $table->string('kost_rules');
             $table->string('desc');
             $table->integer('unit_open');
             $table->integer('total_unit');
