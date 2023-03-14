@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rating;
 use App\Models\Comments;
-use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Http\Client\Response;
 
 class CommentsController extends Controller
 {
@@ -27,6 +28,13 @@ class CommentsController extends Controller
             'comment_body' => $request->comment_body,
             'rating' => $request->rating
         ]); 
+
+        Rating::create([
+            'kost_id' => $request->kost_id,
+            'rating' => $request->rating,
+        ]);
+
+        
 
         return response()->json([
             'message' => 'success',

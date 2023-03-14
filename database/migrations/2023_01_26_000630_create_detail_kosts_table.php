@@ -13,20 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('detail_kosts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('seller_id');
             $table->foreignId('kost_id');
-            $table->foreignId('user_id');
-            $table->string('order_id');
-            $table->string('status');
+            $table->integer('profit');
+            $table->string('avg_rating');
+            $table->integer('unit_rented');
+            $table->integer('unit_open');
             $table->string('kost_name');
-            $table->string('kost_type');
-            $table->string('location');
-            $table->string('stay_duration');
-            $table->integer('total_price');
-            $table->integer('electricity')->nullable();
-            $table->integer('room_price');
-            $table->string('due_date');
+            $table->string('status');
+            $table->string('kost_img')->nullable();
+            $table->string('kost_location');
             $table->timestamps();
         });
     }
@@ -38,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('detail_kosts');
     }
 };

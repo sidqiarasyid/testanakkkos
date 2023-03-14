@@ -19,9 +19,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
+        'phone',
         'email',
         'password',
-        'role'
+        'role',
+        'pfp',
+        'chat_status'
     ];
 
     /**
@@ -45,6 +50,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function chatroom(){
+        return $this->hasOne(KostChat::class);
+    }
+
     public function comment()
     {
         return $this->hasMany(Comments::class, 'user_id');
@@ -56,5 +65,9 @@ class User extends Authenticatable
 
     public function kost(){
         return $this->hasMany(Kost::class);
+    }
+
+    public function message(){
+        return $this->hasMany(Message::class);
     }
 }
